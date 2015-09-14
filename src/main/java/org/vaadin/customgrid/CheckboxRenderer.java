@@ -20,9 +20,8 @@ import com.vaadin.data.Property;
 import com.vaadin.ui.renderers.ClickableRenderer;
 
 /**
- * Provides various helper methods for connectors. Meant for internal use.
- * 
- * @author Vaadin Ltd
+ * CheckboxRenderer that supports updating data on the server when checkbox is
+ * clicked.
  */
 public class CheckboxRenderer extends ClickableRenderer<Boolean> {
     public CheckboxRenderer() {

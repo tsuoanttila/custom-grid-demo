@@ -14,6 +14,9 @@ import com.vaadin.shared.ui.Connect;
 
 import elemental.json.JsonObject;
 
+/**
+ * Custom editor event handling logic
+ */
 @Connect(EditorHandlingOverrideExtension.class)
 public class EditorHandlingOverrideExtensionConnector extends
         AbstractExtensionConnector {
@@ -79,6 +82,7 @@ public class EditorHandlingOverrideExtensionConnector extends
                             return false;
                         }
 
+                        // Mouse move events are handled as the default does it.
                         return super.handleMoveEvent(event);
                     }
 

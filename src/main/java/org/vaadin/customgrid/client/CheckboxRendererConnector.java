@@ -30,7 +30,7 @@ import com.vaadin.shared.ui.Connect;
 import elemental.json.JsonObject;
 
 /**
- * CheckboxRendererConnector provides click events for value updates.
+ * Connector for the CheckboxRenderer class.
  */
 @Connect(CheckboxRenderer.class)
 public class CheckboxRendererConnector extends
@@ -51,7 +51,7 @@ public class CheckboxRendererConnector extends
     }
 
     /**
-     * Provides various helper methods for connectors. Meant for internal use.
+     * Client-side implementation of the clickable checkbox renderer
      */
     public static class CheckboxRenderer extends
             ClickableRenderer<Boolean, VCheckBox> {
