@@ -9,6 +9,7 @@ import com.vaadin.client.ServerConnector;
 import com.vaadin.client.connectors.GridConnector;
 import com.vaadin.client.extensions.AbstractExtensionConnector;
 import com.vaadin.client.widget.grid.DefaultEditorEventHandler;
+import com.vaadin.client.widgets.Grid;
 import com.vaadin.client.widgets.Grid.EditorDomEvent;
 import com.vaadin.shared.ui.Connect;
 
@@ -18,12 +19,15 @@ import elemental.json.JsonObject;
  * Custom editor event handling logic
  */
 @Connect(EditorHandlingOverrideExtension.class)
-public class EditorHandlingOverrideExtensionConnector extends
-        AbstractExtensionConnector {
+public class EditorHandlingOverrideExtensionConnector
+        extends AbstractExtensionConnector {
+
+    private Grid<JsonObject> grid;
 
     @Override
     protected void extend(ServerConnector target) {
-        getParent().getWidget().getEditor()
+        grid = getParent().getWidget();
+        grid.getEditor()
                 .setEventHandler(new DefaultEditorEventHandler<JsonObject>() {
 
                     @Override
@@ -31,8 +35,8 @@ public class EditorHandlingOverrideExtensionConnector extends
                             EditorDomEvent<JsonObject> event) {
                         Event e = event.getDomEvent();
                         if (e.getType().equals(BrowserEvents.CLICK)) {
-                            editRow(event, event.getCell().getRowIndex(), event
-                                    .getCell().getColumnIndexDOM());
+                            editRow(event, event.getCell().getRowIndex(),
+                                    event.getCell().getColumnIndexDOM());
                             return true;
                         } else if (e.getType().equals(BrowserEvents.DBLCLICK)) {
                             // On double click don't do anything.
@@ -91,8 +95,7 @@ public class EditorHandlingOverrideExtensionConnector extends
 
     @Override
     public void onUnregister() {
-        // Restore the default event handler.
-        getParent().getWidget().getEditor()
+        grid.getEditor()
                 .setEventHandler(new DefaultEditorEventHandler<JsonObject>());
 
         super.onUnregister();

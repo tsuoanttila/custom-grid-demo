@@ -126,7 +126,7 @@
 					<webappDirectory>${basedir}/target/classes/VAADIN/widgetsets</webappDirectory>
 					<draftCompile>false</draftCompile>
 					<compileReport>false</compileReport>
-					<style>OBF</style>
+					<style>PRETTY</style>
 					<strict>true</strict>
 				</configuration>
 				<executions>
@@ -199,6 +199,7 @@
 											<goal>update-widgetset</goal>
 											<goal>compile</goal>
 											<goal>compile-theme</goal>
+											<goal>update-theme</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

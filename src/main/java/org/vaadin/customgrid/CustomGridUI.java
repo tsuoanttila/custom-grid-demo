@@ -7,6 +7,7 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.AbstractGridExtension;
@@ -27,8 +28,8 @@ public class CustomGridUI extends UI {
     /**
      * Server-side of the extension to change the editor event handling
      */
-    public static class EditorHandlingOverrideExtension extends
-            AbstractGridExtension {
+    public static class EditorHandlingOverrideExtension
+            extends AbstractGridExtension {
         private EditorHandlingOverrideExtension(Grid grid) {
             super(grid);
         }
@@ -41,16 +42,29 @@ public class CustomGridUI extends UI {
     /**
      * Multiple selection model without selection column.
      */
-    public static class MultiSelectionNoColumnModel extends MultiSelectionModel {
+    public static class MultiSelectionNoColumnModel
+            extends MultiSelectionModel {
     }
+
+    private Grid grid;
+    final VerticalLayout layout = new VerticalLayout();
 
     @Override
     protected void init(VaadinRequest request) {
-        final VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);
         setContent(layout);
 
-        final Grid grid = new Grid();
+        layout.addComponent(new Button("Replace Grid", e -> createNewGrid()));
+        layout.addComponent(new Button("Set Editor Event Handler",
+                e -> EditorHandlingOverrideExtension.extend(grid)));
+
+        createNewGrid();
+        EditorHandlingOverrideExtension.extend(grid);
+    }
+
+    private void createNewGrid() {
+        Grid grid = new Grid();
+
         grid.setEditorEnabled(true);
         grid.setEditorBuffered(false);
 
@@ -61,7 +75,6 @@ public class CustomGridUI extends UI {
                 .setRenderer(new CheckboxRenderer())
                 .setEditorField(editorCheckbox);
         grid.setSelectionModel(new MultiSelectionNoColumnModel());
-        EditorHandlingOverrideExtension.extend(grid);
 
         grid.addRow("Unbuffered editor", true);
         grid.addRow("Editor event handling", true);
@@ -69,7 +82,12 @@ public class CustomGridUI extends UI {
         grid.addRow("Shift selection", false);
         grid.addRow("Column drag resize", false);
 
-        layout.addComponent(grid);
+        if (this.grid != null) {
+            layout.replaceComponent(this.grid, grid);
+        } else {
+            layout.addComponentAsFirst(grid);
+        }
+        this.grid = grid;
     }
 
 }
