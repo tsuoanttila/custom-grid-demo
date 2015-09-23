@@ -43,6 +43,7 @@ public class EditorHandlingOverrideExtensionConnector
                             return false;
                         }
 
+                        // Default opening handling for all the other cases.
                         return super.handleOpenEvent(event);
                     }
 
@@ -72,6 +73,19 @@ public class EditorHandlingOverrideExtensionConnector
                                     && (e.getCtrlKey() || e.getMetaKey())) {
                                 --col;
                                 change = true;
+                            } else if (e.getKeyCode() == KeyCodes.KEY_TAB) {
+                                // Manage Tab to handle focus and scrolling
+                                // gracfully.
+                                boolean isLastColumn = event
+                                        .getFocusedColumnIndex() == event
+                                                .getGrid().getVisibleColumns()
+                                                .size() - 1;
+                                boolean isFirstColumn = event
+                                        .getFocusedColumnIndex() > 0;
+                                if ((e.getShiftKey() && isFirstColumn)
+                                        || (!e.getShiftKey() && isLastColumn)) {
+                                    return super.handleMoveEvent(event);
+                                }
                             }
 
                             if (change) {
