@@ -33,58 +33,53 @@ import elemental.json.JsonObject;
  * Connector for the CheckboxRenderer class.
  */
 @Connect(CheckboxRenderer.class)
-public class CheckboxRendererConnector extends
-        ClickableRendererConnector<Boolean> {
+public class CheckboxRendererConnector extends ClickableRendererConnector<Boolean> {
 
-    public CheckboxRendererConnector() {
-    }
+	public CheckboxRendererConnector() {
+	}
 
-    @Override
-    public CheckboxRenderer getRenderer() {
-        return (CheckboxRenderer) super.getRenderer();
-    }
+	@Override
+	public CheckboxRenderer getRenderer() {
+		return (CheckboxRenderer) super.getRenderer();
+	}
 
-    @Override
-    protected HandlerRegistration addClickHandler(
-            ClickableRenderer.RendererClickHandler<JsonObject> handler) {
-        return getRenderer().addClickHandler(handler);
-    }
+	@Override
+	protected HandlerRegistration addClickHandler(ClickableRenderer.RendererClickHandler<JsonObject> handler) {
+		return getRenderer().addClickHandler(handler);
+	}
 
-    /**
-     * Client-side implementation of the clickable checkbox renderer
-     */
-    public static class CheckboxRenderer extends
-            ClickableRenderer<Boolean, VCheckBox> {
+	/**
+	 * Client-side implementation of the clickable checkbox renderer
+	 */
+	public static class CheckboxRenderer extends ClickableRenderer<Boolean, VCheckBox> {
 
-        public CheckboxRenderer() {
-            super();
-        }
+		public CheckboxRenderer() {
+			super();
+		}
 
-        @Override
-        public VCheckBox createWidget() {
-            VCheckBox b = GWT.create(VCheckBox.class);
-            b.addClickHandler(this);
-            b.setStylePrimaryName("v-checkbox");
-            return b;
-        }
+		@Override
+		public VCheckBox createWidget() {
+			VCheckBox b = GWT.create(VCheckBox.class);
+			b.addClickHandler(this);
+			b.setStylePrimaryName("v-checkbox");
+			return b;
+		}
 
-        @Override
-        public void render(RendererCellReference cell, Boolean value,
-                VCheckBox checkBox) {
-            checkBox.setValue(value, false);
-        }
+		@Override
+		public void render(RendererCellReference cell, Boolean value, VCheckBox checkBox) {
+			checkBox.setValue(value, false);
+		}
 
-        @Override
-        public void onClick(ClickEvent event) {
-            // VCheckBox sends two clicks when clicked by the label. Don't send
-            // duplicate events to server.
-            if (Element.as(event.getNativeEvent().getEventTarget())
-                    .getTagName().equalsIgnoreCase("input")) {
-                super.onClick(event);
-            }
+		@Override
+		public void onClick(ClickEvent event) {
+			// VCheckBox sends two clicks when clicked by the label. Don't send
+			// duplicate events to server.
+			if (Element.as(event.getNativeEvent().getEventTarget()).getTagName().equalsIgnoreCase("input")) {
+				super.onClick(event);
+			}
 
-            // Don't let grid handle the events.
-            event.stopPropagation();
-        }
-    }
+			// Don't let grid handle the events.
+			event.stopPropagation();
+		}
+	}
 }

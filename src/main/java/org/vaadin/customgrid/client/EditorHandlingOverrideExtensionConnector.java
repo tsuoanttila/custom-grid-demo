@@ -19,105 +19,103 @@ import elemental.json.JsonObject;
  * Custom editor event handling logic
  */
 @Connect(EditorHandlingOverrideExtension.class)
-public class EditorHandlingOverrideExtensionConnector
-        extends AbstractExtensionConnector {
+public class EditorHandlingOverrideExtensionConnector extends AbstractExtensionConnector {
 
-    private Grid<JsonObject> grid;
+	private final class CustomEventHandler extends DefaultEditorEventHandler<JsonObject> {
 
-    @Override
-    protected void extend(ServerConnector target) {
-        grid = getParent().getWidget();
-        grid.getEditor()
-                .setEventHandler(new DefaultEditorEventHandler<JsonObject>() {
+		@Override
+		protected boolean isOpenEvent(EditorDomEvent<JsonObject> event) {
+			String eventType = event.getDomEvent().getType();
+			if (eventType.equals(BrowserEvents.DBLCLICK)) {
+				// Don't open on double click
+				return false;
+			}
+			return super.isOpenEvent(event)
+					|| (eventType.equals(BrowserEvents.CLICK) && noModifiers(event.getDomEvent()));
+		}
 
-                    @Override
-                    protected boolean handleOpenEvent(
-                            EditorDomEvent<JsonObject> event) {
-                        Event e = event.getDomEvent();
-                        if (e.getType().equals(BrowserEvents.CLICK)) {
-                            editRow(event, event.getCell().getRowIndex(),
-                                    event.getCell().getColumnIndexDOM());
-                            return true;
-                        } else if (e.getType().equals(BrowserEvents.DBLCLICK)) {
-                            // On double click don't do anything.
-                            return false;
-                        }
+		private boolean noModifiers(Event e) {
+			return !e.getAltKey() && !e.getCtrlKey() && !e.getMetaKey() && !e.getShiftKey();
+		}
 
-                        // Default opening handling for all the other cases.
-                        return super.handleOpenEvent(event);
-                    }
+		@Override
+		protected boolean handleMoveEvent(EditorDomEvent<JsonObject> event) {
+			// Override most of handleMoveEvent, since the changes are big.
+			Event e = event.getDomEvent();
+			int row = event.getRowIndex();
+			int col = event.getCell().getColumnIndexDOM();
 
-                    @Override
-                    protected boolean handleMoveEvent(
-                            EditorDomEvent<JsonObject> event) {
-                        Event e = event.getDomEvent();
-                        if (e.getType().equals(BrowserEvents.KEYDOWN)) {
-                            int row = event.getRowIndex();
-                            int col = event.getCell().getColumnIndexDOM();
+			if (e.getType().equals(BrowserEvents.CLICK)) {
+				if (!hasModifiers(e)) {
+					editRow(event, row, col);
+				}
+				return true;
+			}
 
-                            boolean change = false;
-                            // Move with ctrl/meta + arrow keys
-                            if (e.getKeyCode() == KeyCodes.KEY_DOWN
-                                    && (e.getCtrlKey() || e.getMetaKey())) {
-                                ++row;
-                                change = true;
-                            } else if (e.getKeyCode() == KeyCodes.KEY_UP
-                                    && (e.getCtrlKey() || e.getMetaKey())) {
-                                --row;
-                                change = true;
-                            } else if (e.getKeyCode() == KeyCodes.KEY_RIGHT
-                                    && (e.getCtrlKey() || e.getMetaKey())) {
-                                ++col;
-                                change = true;
-                            } else if (e.getKeyCode() == KeyCodes.KEY_LEFT
-                                    && (e.getCtrlKey() || e.getMetaKey())) {
-                                --col;
-                                change = true;
-                            } else if (e.getKeyCode() == KeyCodes.KEY_TAB) {
-                                // Manage Tab to handle focus and scrolling
-                                // gracfully.
-                                boolean isLastColumn = event
-                                        .getFocusedColumnIndex() == event
-                                                .getGrid().getVisibleColumns()
-                                                .size() - 1;
-                                boolean isFirstColumn = event
-                                        .getFocusedColumnIndex() > 0;
-                                if ((e.getShiftKey() && isFirstColumn)
-                                        || (!e.getShiftKey() && isLastColumn)) {
-                                    return super.handleMoveEvent(event);
-                                }
-                            }
+			if (e.getType().equals(BrowserEvents.KEYDOWN)) {
 
-                            if (change) {
-                                editRow(event, row, col);
-                                e.preventDefault();
-                            }
-                            return change;
+				boolean change = false;
+				// Move with ctrl/meta + arrow keys
+				if (e.getKeyCode() == KeyCodes.KEY_DOWN && (e.getCtrlKey() || e.getMetaKey())) {
+					++row;
+					change = true;
+				} else if (e.getKeyCode() == KeyCodes.KEY_UP && (e.getCtrlKey() || e.getMetaKey())) {
+					--row;
+					change = true;
+				} else if (e.getKeyCode() == KeyCodes.KEY_RIGHT && (e.getCtrlKey() || e.getMetaKey())) {
+					++col;
+					change = true;
+				} else if (e.getKeyCode() == KeyCodes.KEY_LEFT && (e.getCtrlKey() || e.getMetaKey())) {
+					--col;
+					change = true;
+				} else if (e.getKeyCode() == KeyCodes.KEY_TAB) {
+					// Manage Tab to handle focus and scrolling gracefully.
+					boolean isLastColumn = event.getFocusedColumnIndex() == event.getGrid().getVisibleColumns().size()
+							- 1;
+					boolean isFirstColumn = event.getFocusedColumnIndex() > 0;
+					if ((e.getShiftKey() && isFirstColumn) || (!e.getShiftKey() && isLastColumn)) {
+						return super.handleMoveEvent(event);
+					}
+				}
 
-                        } else if (e.getType().equals(BrowserEvents.KEYPRESS)
-                                || e.getType().equals(BrowserEvents.KEYUP)) {
-                            // Don't handle any other key events.
-                            return false;
-                        }
+				if (change) {
+					editRow(event, row, col);
+					e.preventDefault();
+				}
+				return change;
 
-                        // Mouse move events are handled as the default does it.
-                        return super.handleMoveEvent(event);
-                    }
+			} else if (e.getType().equals(BrowserEvents.KEYPRESS) || e.getType().equals(BrowserEvents.KEYUP)) {
+				// Don't handle any other key events.
+				return false;
+			}
 
-                });
-    }
+			// Touch move events are handled as the default does it.
+			return super.handleMoveEvent(event);
+		}
 
-    @Override
-    public void onUnregister() {
-        grid.getEditor()
-                .setEventHandler(new DefaultEditorEventHandler<JsonObject>());
+		private boolean hasModifiers(Event e) {
+			return e.getAltKey() || e.getCtrlKey() || e.getMetaKey() || e.getShiftKey();
+		}
+	}
 
-        super.onUnregister();
-    }
+	private Grid<JsonObject> grid;
 
-    @Override
-    public GridConnector getParent() {
-        return (GridConnector) super.getParent();
-    }
+	@Override
+	protected void extend(ServerConnector target) {
+		grid = getParent().getWidget();
+		grid.getEditor().setEventHandler(new CustomEventHandler());
+	}
+
+	@Override
+	public void onUnregister() {
+		grid.getEditor().setEventHandler(new DefaultEditorEventHandler<JsonObject>());
+
+		super.onUnregister();
+	}
+
+	@Override
+	public GridConnector getParent() {
+		return (GridConnector) super.getParent();
+	}
 
 }

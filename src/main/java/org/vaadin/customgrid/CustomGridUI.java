@@ -29,8 +29,7 @@ public class CustomGridUI extends UI {
 	/**
 	 * Server-side of the extension to change the editor event handling
 	 */
-	public static class EditorHandlingOverrideExtension extends
-			AbstractGridExtension {
+	public static class EditorHandlingOverrideExtension extends AbstractGridExtension {
 		private EditorHandlingOverrideExtension(Grid grid) {
 			super(grid);
 		}
@@ -54,16 +53,14 @@ public class CustomGridUI extends UI {
 		VerticalLayout baseLayout = new VerticalLayout();
 		baseLayout.setMargin(true);
 		baseLayout.setSpacing(true);
-		baseLayout
-				.addComponent(new Label(
-						"Customised Grid with special Editor event handling and multi selection model without selection column. Editor can be moved around with Ctrl/Cmd + Arrow keys."));
+		baseLayout.addComponent(new Label(
+				"Customised Grid with special Editor event handling and multi selection model without selection column. Editor can be moved around with Ctrl/Cmd + Arrow keys."));
 		layout.setSpacing(true);
 		baseLayout.addComponent(layout);
 		setContent(baseLayout);
 
 		layout.addComponent(new Button("Replace Grid", e -> createNewGrid()));
-		layout.addComponent(new Button("Set Editor Event Handler",
-				e -> EditorHandlingOverrideExtension.extend(grid)));
+		layout.addComponent(new Button("Set Editor Event Handler", e -> EditorHandlingOverrideExtension.extend(grid)));
 
 		createNewGrid();
 		EditorHandlingOverrideExtension.extend(grid);
@@ -78,8 +75,7 @@ public class CustomGridUI extends UI {
 		grid.addColumn("name");
 		CheckBox editorCheckbox = new CheckBox();
 		editorCheckbox.addStyleName("with-margin");
-		grid.addColumn("status", Boolean.class).setHeaderCaption("Works?")
-				.setRenderer(new CheckboxRenderer())
+		grid.addColumn("status", Boolean.class).setHeaderCaption("Works?").setRenderer(new CheckboxRenderer())
 				.setEditorField(editorCheckbox);
 		grid.setSelectionModel(new MultiSelectionNoColumnModel());
 

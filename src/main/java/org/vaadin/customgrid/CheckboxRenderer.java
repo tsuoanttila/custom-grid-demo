@@ -24,29 +24,25 @@ import com.vaadin.ui.renderers.ClickableRenderer;
  * clicked.
  */
 public class CheckboxRenderer extends ClickableRenderer<Boolean> {
-    public CheckboxRenderer() {
-        super(Boolean.class, null);
-        addClickListener(new RendererClickListener() {
-            @Override
-            public void click(RendererClickEvent event) {
-                System.err.println("Click event from client!");
-                if (event.getColumn().isEditable()
-                        && getParentGrid().isEditorEnabled()) {
-                    Object itemId = event.getItemId();
-                    Object propertyId = event.getPropertyId();
+	public CheckboxRenderer() {
+		super(Boolean.class, null);
+		addClickListener(new RendererClickListener() {
+			@Override
+			public void click(RendererClickEvent event) {
+				System.err.println("Click event from client!");
+				if (event.getColumn().isEditable() && getParentGrid().isEditorEnabled()) {
+					Object itemId = event.getItemId();
+					Object propertyId = event.getPropertyId();
 
-                    Container.Indexed containerDataSource = getParentGrid()
-                            .getContainerDataSource();
-                    Property itemProperty = containerDataSource.getItem(itemId)
-                            .getItemProperty(propertyId);
+					Container.Indexed containerDataSource = getParentGrid().getContainerDataSource();
+					Property itemProperty = containerDataSource.getItem(itemId).getItemProperty(propertyId);
 
-                    itemProperty.setValue(!Boolean.TRUE.equals(itemProperty
-                            .getValue()));
+					itemProperty.setValue(!Boolean.TRUE.equals(itemProperty.getValue()));
 
-                    getParentGrid().editItem(itemId);
-                }
-            }
-        });
-    }
+					getParentGrid().editItem(itemId);
+				}
+			}
+		});
+	}
 
 }
